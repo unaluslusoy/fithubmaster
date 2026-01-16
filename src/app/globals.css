@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+:root {
+  /* Brand Colors */
+  --rich-black: #021B1A;
+  --dark-green: #032221;
+  --bangladesh-green: #03624C;
+  --mountain-meadow: #2CC295;
+  --caribbean-green: #00DF81;
+  --anti-flash-white: #F1F7F6;
+  
+  --pine: #06302B;
+  --basil: #0B453A;
+  --forest: #095544;
+  --frog: #1B7B6D;
+  --mint: #2FA98C;
+  --stone: #7D7D7D;
+  --pistachio: #AACBC4;
+
+  /* Theme mappings */
+  --background: var(--anti-flash-white);
+  --foreground: var(--rich-black);
+
+  --card: #ffffff;
+  --card-foreground: var(--rich-black);
+ 
+  --popover: #ffffff;
+  --popover-foreground: var(--rich-black);
+ 
+  --primary: var(--rich-black);
+  --primary-foreground: var(--anti-flash-white);
+ 
+  --secondary: var(--pine);
+  --secondary-foreground: var(--pistachio);
+ 
+  --muted: #f1f5f9;
+  --muted-foreground: var(--stone);
+ 
+  --accent: var(--mountain-meadow);
+  --accent-foreground: var(--rich-black);
+ 
+  --destructive: #ef4444;
+  --destructive-foreground: #f8fafc;
+
+  --border: var(--forest);
+  --input: var(--forest);
+  --ring: var(--caribbean-green);
+
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+
+  /* Brand specifics */
+  --color-brand-green: var(--caribbean-green);
+  --color-brand-dark: var(--rich-black);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--rich-black);
+    --foreground: var(--anti-flash-white);
+    --card: var(--pine);
+    --card-foreground: var(--anti-flash-white);
+    --popover: var(--pine);
+    --popover-foreground: var(--anti-flash-white);
+    --muted: var(--dark-green);
+    --border: var(--forest);
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans, sans-serif);
+}

@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  TRAINER
+  CLIENT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  passwordHash      String    @map("password_hash")
+  firstName         String    @map("first_name")
+  lastName          String    @map("last_name")
+  phone             String?
+  role              Role      @default(CLIENT)
+  status            UserStatus @default(PENDING)
+  
+  emailVerified     Boolean   @default(false) @map("email_verified")
+  phoneVerified     Boolean   @default(false) @map("phone_verified")
+  twoFactorEnabled  Boolean   @default(false) @map("two_factor_enabled")
+  avatarUrl         String?   @map("avatar_url")
+  locale            String    @default("tr")
+
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  lastLoginAt       DateTime? @map("last_login_at")
+
+  // Relations
+  trainerProfile    Trainer?
+  studentProfile    Student?
+
+  @@map("users")
+}
+
+model Trainer {
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  bio             String?
+  specializations String[]
+  certifications  String[]
+  experienceYears Int      @default(0) @map("experience_years")
+  hourlyRate      Decimal? @map("hourly_rate")
+  rating          Decimal? @default(0)
+  totalStudents   Int      @default(0) @map("total_students")
+  isVerified      Boolean  @default(false) @map("is_verified")
+
+  // Relations
+  students        Student[]
+  workoutPlans    WorkoutPlan[]
+  nutritionPlans  NutritionPlan[]
+  appointments    Appointment[]
+
+  @@map("trainers")
+}
+
+model Student {
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  trainerId       String?  @map("trainer_id")
+  trainer         Trainer? @relation(fields: [trainerId], references: [id])
+
+  height          Float?
+  weight          Float?
+  birthDate       DateTime? @map("birth_date")
+  gender          Gender?
+  fitnessLevel    String?   @map("fitness_level")
+  goals           String?
+  medicalConditions String? @map("medical_conditions")
+  subscriptionId  String?   @map("subscription_id")
+
+  // Relations
+  nutritionPlans  NutritionPlan[]
+  appointments    Appointment[]
+
+  @@map("students")
+}
+
+model WorkoutPlan {
+  id              String   @id @default(uuid())
+  trainerId       String   @map("trainer_id")
+  trainer         Trainer  @relation(fields: [trainerId], references: [id])
+  
+  name            String
+  description     String?
+  difficulty      String?
+  durationWeeks   Int?     @map("duration_weeks")
+  isTemplate      Boolean  @default(false) @map("is_template")
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("workout_plans")
+}
+
+model NutritionPlan {
+  id              String   @id @default(uuid())
+  trainerId       String   @map("trainer_id")
+  trainer         Trainer  @relation(fields: [trainerId], references: [id])
+  
+  studentId       String?  @map("student_id")
+  student         Student? @relation(fields: [studentId], references: [id])
+
+  name            String
+  dailyCalories   Int?     @map("daily_calories")
+  proteinGrams    Int?     @map("protein_grams")
+  carbsGrams      Int?     @map("carbs_grams")
+  fatGrams        Int?     @map("fat_grams")
+  
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+
+  @@map("nutrition_plans")
+}
+
+model Appointment {
+  id              String   @id @default(uuid())
+  trainerId       String   @map("trainer_id")
+  trainer         Trainer  @relation(fields: [trainerId], references: [id])
+  
+  studentId       String   @map("student_id")
+  student         Student  @relation(fields: [studentId], references: [id])
+
+  title           String
+  startTime       DateTime @map("start_time")
+  endTime         DateTime @map("end_time")
+  location        String?
+  status          String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  notes           String?
+  reminderSent    Boolean  @default(false) @map("reminder_sent")
+
+  @@map("appointments")
+}
+
+model Package {
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  price           Decimal
+  currency        String   @default("TRY")
+  
+  durationDays    Int      @map("duration_days")
+  maxStudents     Int?     @map("max_students")
+  maxTrainers     Int?     @map("max_trainers")
+  features        String[]
+  isActive        Boolean  @default(true) @map("is_active")
+
+  @@map("packages")
+}
