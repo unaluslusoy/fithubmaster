@@ -4,15 +4,20 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-enum Role {
+// -----------------------------------------------------------------------------
+// ENUMS & SHARED TYPES
+// -----------------------------------------------------------------------------
+
+enum AdminRole {
   SUPER_ADMIN
-  TRAINER
-  CLIENT
+  EDITOR
+  SUPPORT
 }
 
-enum UserStatus {
+enum AccountStatus {
   ACTIVE
   INACTIVE
   SUSPENDED
@@ -25,84 +30,146 @@ enum Gender {
   OTHER
 }
 
-model User {
-  id                String    @id @default(uuid())
-  email             String    @unique
-  passwordHash      String    @map("password_hash")
-  firstName         String    @map("first_name")
-  lastName          String    @map("last_name")
-  phone             String?
-  role              Role      @default(CLIENT)
-  status            UserStatus @default(PENDING)
+// -----------------------------------------------------------------------------
+// 1. SUPER ADMIN PANEL ENTITIES
+// -----------------------------------------------------------------------------
+
+model Admin {
+  id              String        @id @default(uuid())
+  email           String        @unique
+  passwordHash    String        @map("password_hash")
+  firstName       String        @map("first_name")
+  lastName        String        @map("last_name")
+  avatarUrl       String?       @map("avatar_url")
+  role            AdminRole     @default(SUPER_ADMIN)
+  status          AccountStatus @default(ACTIVE)
   
-  emailVerified     Boolean   @default(false) @map("email_verified")
-  phoneVerified     Boolean   @default(false) @map("phone_verified")
-  twoFactorEnabled  Boolean   @default(false) @map("two_factor_enabled")
-  avatarUrl         String?   @map("avatar_url")
-  locale            String    @default("tr")
+  // Relations for Permission Management
+  userGroupId     String?       @map("user_group_id")
+  userGroup       UserGroup?    @relation(fields: [userGroupId], references: [id])
 
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-  lastLoginAt       DateTime? @map("last_login_at")
+  lastLoginAt     DateTime?     @map("last_login_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
 
-  // Relations
-  trainerProfile    Trainer?
-  studentProfile    Student?
-
-  @@map("users")
+  @@map("admins")
 }
 
-model Trainer {
-  id              String   @id @default(uuid())
-  userId          String   @unique @map("user_id")
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model UserGroup {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  description String?
+  permissions Permission[]
+  admins      Admin[]      // Admins belonging to this group
   
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@map("user_groups")
+}
+
+model Permission {
+  id          String      @id @default(uuid())
+  action      String      // e.g. "create", "read", "update"
+  subject     String      // e.g. "trainers", "finance", "settings"
+  description String?
+  
+  groups      UserGroup[]
+  
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  
+  @@unique([action, subject])
+  @@map("permissions")
+}
+
+// -----------------------------------------------------------------------------
+// 2. TRAINER PANEL ENTITIES
+// -----------------------------------------------------------------------------
+
+model Trainer {
+  id              String        @id @default(uuid())
+  email           String        @unique
+  passwordHash    String        @map("password_hash")
+  firstName       String        @map("first_name")
+  lastName        String        @map("last_name")
+  phone           String?
+  avatarUrl       String?       @map("avatar_url")
+  status          AccountStatus @default(PENDING)
+  
+  // Professional Details
   bio             String?
   specializations String[]
   certifications  String[]
-  experienceYears Int      @default(0) @map("experience_years")
-  hourlyRate      Decimal? @map("hourly_rate")
-  rating          Decimal? @default(0)
-  totalStudents   Int      @default(0) @map("total_students")
-  isVerified      Boolean  @default(false) @map("is_verified")
-
+  experienceYears Int           @default(0) @map("experience_years")
+  hourlyRate      Decimal?      @map("hourly_rate")
+  rating          Decimal?      @default(0)
+  totalStudents   Int           @default(0) @map("total_students")
+  isVerified      Boolean       @default(false) @map("is_verified")
+  
   // Relations
-  students        Student[]
+  clients         Client[]
   workoutPlans    WorkoutPlan[]
   nutritionPlans  NutritionPlan[]
   appointments    Appointment[]
+  
+  lastLoginAt     DateTime?     @map("last_login_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
 
   @@map("trainers")
 }
 
-model Student {
-  id              String   @id @default(uuid())
-  userId          String   @unique @map("user_id")
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+// -----------------------------------------------------------------------------
+// 3. CLIENT (STUDENT) PANEL ENTITIES
+// -----------------------------------------------------------------------------
+
+model Client {
+  id              String        @id @default(uuid())
+  email           String        @unique
+  passwordHash    String        @map("password_hash")
+  firstName       String        @map("first_name")
+  lastName        String        @map("last_name")
+  phone           String?
+  avatarUrl       String?       @map("avatar_url")
+  status          AccountStatus @default(ACTIVE)
   
-  trainerId       String?  @map("trainer_id")
-  trainer         Trainer? @relation(fields: [trainerId], references: [id])
-
-  height          Float?
-  weight          Float?
-  birthDate       DateTime? @map("birth_date")
+  // Physical Profile
+  height          Float?        // cm
+  weight          Float?        // kg
+  birthDate       DateTime?     @map("birth_date")
   gender          Gender?
-  fitnessLevel    String?   @map("fitness_level")
+  fitnessLevel    String?       @map("fitness_level")
   goals           String?
-  medicalConditions String? @map("medical_conditions")
-  subscriptionId  String?   @map("subscription_id")
-
+  medicalConditions String?     @map("medical_conditions")
+  
   // Relations
+  trainerId       String?       @map("trainer_id")
+  trainer         Trainer?      @relation(fields: [trainerId], references: [id])
+  
+  activePlanId    String?       @map("active_plan_id")
   nutritionPlans  NutritionPlan[]
   appointments    Appointment[]
 
-  @@map("students")
+  lastLoginAt     DateTime?     @map("last_login_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@map("clients")
 }
+
+// -----------------------------------------------------------------------------
+// 4. SHARED MODULES (Workout, Nutrition, Calendar, Finance)
+// -----------------------------------------------------------------------------
 
 model WorkoutPlan {
   id              String   @id @default(uuid())
   trainerId       String   @map("trainer_id")
   trainer         Trainer  @relation(fields: [trainerId], references: [id])
+  
+  // If assigned to a specific client
+  clientId        String?  @map("client_id")
+  // Note: We can add Client relation if needed, but usually templates are generic
   
   name            String
   description     String?
@@ -121,8 +188,8 @@ model NutritionPlan {
   trainerId       String   @map("trainer_id")
   trainer         Trainer  @relation(fields: [trainerId], references: [id])
   
-  studentId       String?  @map("student_id")
-  student         Student? @relation(fields: [studentId], references: [id])
+  clientId        String?  @map("client_id")
+  client          Client?  @relation(fields: [clientId], references: [id])
 
   name            String
   dailyCalories   Int?     @map("daily_calories")
@@ -133,6 +200,9 @@ model NutritionPlan {
   startDate       DateTime? @map("start_date")
   endDate         DateTime? @map("end_date")
 
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
   @@map("nutrition_plans")
 }
 
@@ -141,8 +211,8 @@ model Appointment {
   trainerId       String   @map("trainer_id")
   trainer         Trainer  @relation(fields: [trainerId], references: [id])
   
-  studentId       String   @map("student_id")
-  student         Student  @relation(fields: [studentId], references: [id])
+  clientId        String   @map("client_id")
+  client          Client   @relation(fields: [clientId], references: [id])
 
   title           String
   startTime       DateTime @map("start_time")
@@ -151,6 +221,9 @@ model Appointment {
   status          String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED
   notes           String?
   reminderSent    Boolean  @default(false) @map("reminder_sent")
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   @@map("appointments")
 }
@@ -167,6 +240,9 @@ model Package {
   maxTrainers     Int?     @map("max_trainers")
   features        String[]
   isActive        Boolean  @default(true) @map("is_active")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   @@map("packages")
 }

@@ -1,109 +1,153 @@
 @import "tailwindcss";
 
-@plugin "tailwindcss-animate";
+/* ========================================
+   FITHUB DESIGN SYSTEM - Light/Dark Theme
+   ======================================== */
 
 :root {
-  /* Brand Colors */
-  --rich-black: #021B1A;
-  --dark-green: #032221;
-  --bangladesh-green: #03624C;
-  --mountain-meadow: #2CC295;
-  --caribbean-green: #00DF81;
-  --anti-flash-white: #F1F7F6;
+  /* Brand Colors (Constant) */
+  --brand-primary: #10b981;
+  --brand-primary-light: #34d399;
+  --brand-primary-dark: #059669;
   
-  --pine: #06302B;
-  --basil: #0B453A;
-  --forest: #095544;
-  --frog: #1B7B6D;
-  --mint: #2FA98C;
-  --stone: #7D7D7D;
-  --pistachio: #AACBC4;
-
-  /* Theme mappings */
-  --background: var(--anti-flash-white);
-  --foreground: var(--rich-black);
-
-  --card: #ffffff;
-  --card-foreground: var(--rich-black);
- 
-  --popover: #ffffff;
-  --popover-foreground: var(--rich-black);
- 
-  --primary: var(--rich-black);
-  --primary-foreground: var(--anti-flash-white);
- 
-  --secondary: var(--pine);
-  --secondary-foreground: var(--pistachio);
- 
-  --muted: #f1f5f9;
-  --muted-foreground: var(--stone);
- 
-  --accent: var(--mountain-meadow);
-  --accent-foreground: var(--rich-black);
- 
-  --destructive: #ef4444;
-  --destructive-foreground: #f8fafc;
-
-  --border: var(--forest);
-  --input: var(--forest);
-  --ring: var(--caribbean-green);
-
-  --radius: 0.5rem;
+  /* Radius */
+  --radius: 0.75rem;
 }
 
+/* ========================================
+   LIGHT THEME (Default)
+   ======================================== */
+:root, .light {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  
+  --primary: #10b981;
+  --primary-foreground: #ffffff;
+  
+  --secondary: #f1f5f9;
+  --secondary-foreground: #475569;
+  
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #10b981;
+  
+  /* Sidebar specific */
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e2e8f0;
+  --sidebar-text: #64748b;
+  --sidebar-text-active: #0f172a;
+  --sidebar-hover: #f1f5f9;
+}
+
+/* ========================================
+   DARK THEME
+   ======================================== */
+.dark {
+  --background: #0c1210;
+  --foreground: #f1f5f9;
+  
+  --card: #141a18;
+  --card-foreground: #f1f5f9;
+  
+  --popover: #141a18;
+  --popover-foreground: #f1f5f9;
+  
+  --primary: #10b981;
+  --primary-foreground: #0c1210;
+  
+  --secondary: #1e2724;
+  --secondary-foreground: #94a3b8;
+  
+  --muted: #1e2724;
+  --muted-foreground: #64748b;
+  
+  --accent: #1e2724;
+  --accent-foreground: #f1f5f9;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  --border: #1e2724;
+  --input: #1e2724;
+  --ring: #10b981;
+  
+  /* Sidebar specific */
+  --sidebar-bg: #0f1513;
+  --sidebar-border: #1e2724;
+  --sidebar-text: #64748b;
+  --sidebar-text-active: #f1f5f9;
+  --sidebar-hover: #1e2724;
+}
+
+/* ========================================
+   TAILWIND THEME MAPPING
+   ======================================== */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-  
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-
+  
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-sidebar-text-active: var(--sidebar-text-active);
+  --color-sidebar-hover: var(--sidebar-hover);
+  
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-
-  /* Brand specifics */
-  --color-brand-green: var(--caribbean-green);
-  --color-brand-dark: var(--rich-black);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--rich-black);
-    --foreground: var(--anti-flash-white);
-    --card: var(--pine);
-    --card-foreground: var(--anti-flash-white);
-    --popover: var(--pine);
-    --popover-foreground: var(--anti-flash-white);
-    --muted: var(--dark-green);
-    --border: var(--forest);
-  }
+/* ========================================
+   BASE STYLES
+   ======================================== */
+* {
+  border-color: var(--border);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans, sans-serif);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+/* Scrollbar Hiding Utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

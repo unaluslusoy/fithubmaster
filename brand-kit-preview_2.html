@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitHubPoint - Brand Kit v1.0</title>
+    
+    <!-- Google Fonts - Axiforma benzeri font (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================================================================
+           CSS VARIABLES
+           ================================================================ */
+        :root {
+            /* Primary Colors */
+            --rich-black: #021B1A;
+            --dark-green: #032221;
+            --bangladesh-green: #03624C;
+            --mountain-meadow: #2CC295;
+            --caribbean-green: #00DF81;
+            --anti-flash-white: #F1F7F6;
+            
+            /* Secondary Colors */
+            --pine: #06302B;
+            --basil: #0B453A;
+            --forest: #095544;
+            --frog: #1B7B6D;
+            --mint: #2FA98C;
+            --stone: #7D7D7D;
+            --pistachio: #AACBC4;
+            
+            /* Semantic */
+            --success: #00DF81;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --info: #3B82F6;
+            
+            /* Typography */
+            --font-primary: 'Poppins', sans-serif;
+        }
+
+        /* ================================================================
+           BASE STYLES
+           ================================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--dark-green);
+            color: var(--anti-flash-white);
+            line-height: 1.6;
+        }
+
+        /* ================================================================
+           LAYOUT
+           ================================================================ */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* ================================================================
+           HEADER
+           ================================================================ */
+        .header {
+            padding: 3rem 0;
+            text-align: center;
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--pine) 100%);
+            border-bottom: 1px solid var(--forest);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 223, 129, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--caribbean-green) 0%, var(--mountain-meadow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--pistachio);
+            font-weight: 300;
+        }
+
+        .version {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--forest);
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            color: var(--caribbean-green);
+        }
+
+        /* ================================================================
+           NAVIGATION
+           ================================================================ */
+        .nav {
+            background: var(--pine);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--forest);
+        }
+
+        .nav-list {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: var(--pistachio);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--caribbean-green);
+            background: var(--forest);
+        }
+
+        /* ================================================================
+           SECTIONS
+           ================================================================ */
+        .section {
+            padding: 4rem 0;
+            border-bottom: 1px solid var(--forest);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--anti-flash-white);
+        }
+
+        .section-subtitle {
+            color: var(--stone);
+            margin-bottom: 2rem;
+        }
+
+        /* ================================================================
+           COLOR PALETTE
+           ================================================================ */
+        .color-group {
+            margin-bottom: 3rem;
+        }
+
+        .color-group-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            color: var(--caribbean-green);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .color-group-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--caribbean-green);
+            border-radius: 50%;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .color-card {
+            background: var(--pine);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid var(--forest);
+        }
+
+        .color-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--caribbean-green);
+        }
+
+        .color-preview {
+            height: 120px;
+            position: relative;
+        }
+
+        .color-preview::after {
+            content: 'Click to copy';
+            position: absolute;
+            bottom: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .color-card:hover .color-preview::after {
+            opacity: 1;
+        }
+
+        .color-info {
+            padding: 1rem;
+        }
+
+        .color-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .color-hex {
+            font-family: monospace;
+            color: var(--caribbean-green);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .color-rgb {
+            font-size: 0.75rem;
+            color: var(--stone);
+        }
+
+        .color-usage {
+            font-size: 0.75rem;
+            color: var(--pistachio);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* ================================================================
+           TYPOGRAPHY
+           ================================================================ */
+        .typography-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .font-card {
+            background: var(--pine);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid var(--forest);
+        }
+
+        .font-card-title {
+            font-size: 0.875rem;
+            color: var(--caribbean-green);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .font-preview {
+            margin-bottom: 2rem;
+        }
+
+        .font-preview-large {
+            font-size: 4rem;
+            font-weight: 600;
+            line-height: 1;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--anti-flash-white) 0%, var(--pistachio) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .font-preview-alphabet {
+            font-size: 0.875rem;
+            color: var(--pistachio);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .font-weight-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .weight-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--forest);
+        }
+
+        .weight-name {
+            color: var(--stone);
+            font-size: 0.875rem;
+        }
+
+        .weight-value {
+            font-family: monospace;
+            color: var(--caribbean-green);
+            font-size: 0.75rem;
+        }
+
+        /* Font Size Scale */
+        .font-scale {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .scale-item {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: var(--pine);
+            border-radius: 0.5rem;
+            border: 1px solid var(--forest);
+        }
+
+        .scale-label {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--caribbean-green);
+            min-width: 80px;
+        }
+
+        /* ================================================================
+           BUTTONS
+           ================================================================ */
+        .button-showcase {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .button-group-title {
+            width: 100%;
+            font-size: 0.875rem;
+            color: var(--caribbean-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-family: var(--font-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--caribbean-green);
+            color: var(--dark-green);
+        }
+
+        .btn-primary:hover {
+            background: var(--mountain-meadow);
+            box-shadow: 0 0 20px rgba(0, 223, 129, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--forest);
+            color: var(--anti-flash-white);
+        }
+
+        .btn-secondary:hover {
+            background: var(--frog);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--caribbean-green);
+            color: var(--caribbean-green);
+        }
+
+        .btn-outline:hover {
+            background: var(--caribbean-green);
+            color: var(--dark-green);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--caribbean-green);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(0, 223, 129, 0.1);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        .btn-xl {
+            padding: 1.25rem 2.5rem;
+            font-size: 1.125rem;
+        }
+
+        /* ================================================================
+           FORMS
+           ================================================================ */
+        .form-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--pistachio);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-family: var(--font-primary);
+            font-size: 1rem;
+            background: var(--pine);
+            border: 2px solid var(--forest);
+            border-radius: 0.75rem;
+            color: var(--anti-flash-white);
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: var(--stone);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--caribbean-green);
+            box-shadow: 0 0 0 3px rgba(0, 223, 129, 0.2);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300DF81' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+            padding-right: 2.5rem;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* ================================================================
+           CARDS
+           ================================================================ */
+        .card-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--pine);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--forest);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--caribbean-green);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--forest);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--caribbean-green);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: var(--stone);
+        }
+
+        .card-content {
+            color: var(--pistachio);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .card-footer {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--forest);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        /* ================================================================
+           GRADIENTS
+           ================================================================ */
+        .gradient-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .gradient-card {
+            border-radius: 1rem;
+            padding: 2rem;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+        }
+
+        .gradient-name {
+            position: relative;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .gradient-code {
+            position: relative;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 0.5rem;
+        }
+
+        .gradient-primary {
+            background: linear-gradient(135deg, var(--bangladesh-green) 0%, var(--caribbean-green) 100%);
+        }
+
+        .gradient-dark {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--forest) 100%);
+        }
+
+        .gradient-light {
+            background: linear-gradient(135deg, var(--mint) 0%, var(--pistachio) 100%);
+        }
+
+        .gradient-glow {
+            background: linear-gradient(135deg, var(--mountain-meadow) 0%, var(--caribbean-green) 50%, var(--mint) 100%);
+        }
+
+        /* ================================================================
+           SHADOWS
+           ================================================================ */
+        .shadow-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .shadow-card {
+            background: var(--pine);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .shadow-xs { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
+        .shadow-sm { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); }
+        .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .shadow-glow { box-shadow: 0 0 30px rgba(0, 223, 129, 0.5); }
+
+        .shadow-label {
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: var(--caribbean-green);
+            margin-top: 1rem;
+        }
+
+        /* ================================================================
+           SPACING
+           ================================================================ */
+        .spacing-showcase {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .spacing-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .spacing-bar {
+            background: var(--caribbean-green);
+            height: 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .spacing-item:hover .spacing-bar {
+            background: var(--mountain-meadow);
+        }
+
+        .spacing-label {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--pistachio);
+            min-width: 100px;
+        }
+
+        /* ================================================================
+           ICONS
+           ================================================================ */
+        .icon-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 1rem;
+        }
+
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--pine);
+            border-radius: 0.75rem;
+            border: 1px solid var(--forest);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .icon-item:hover {
+            border-color: var(--caribbean-green);
+            transform: translateY(-2px);
+        }
+
+        .icon-item svg {
+            width: 24px;
+            height: 24px;
+            color: var(--caribbean-green);
+        }
+
+        .icon-name {
+            font-size: 0.625rem;
+            color: var(--stone);
+            text-align: center;
+        }
+
+        /* ================================================================
+           FOOTER
+           ================================================================ */
+        .footer {
+            background: var(--rich-black);
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid var(--forest);
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--caribbean-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-text {
+            color: var(--stone);
+            font-size: 0.875rem;
+        }
+
+        /* ================================================================
+           ANIMATIONS
+           ================================================================ */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 223, 129, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(0, 223, 129, 0.6); }
+        }
+
+        .animate-glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        /* ================================================================
+           TOAST NOTIFICATION
+           ================================================================ */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--caribbean-green);
+            color: var(--dark-green);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* ================================================================
+           RESPONSIVE
+           ================================================================ */
+        @media (max-width: 768px) {
+            .header {
+                padding: 2rem 0;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .nav-list {
+                gap: 0.5rem;
+            }
+
+            .section {
+                padding: 2rem 0;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .color-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <h1 class="logo">FitHubPoint</h1>
+            <p class="subtitle">Brand Kit & Design System</p>
+            <span class="version">Version 1.0 • 2025</span>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <ul class="nav-list">
+            <li><a href="#colors" class="nav-link">Renkler</a></li>
+            <li><a href="#typography" class="nav-link">Tipografi</a></li>
+            <li><a href="#buttons" class="nav-link">Butonlar</a></li>
+            <li><a href="#forms" class="nav-link">Formlar</a></li>
+            <li><a href="#cards" class="nav-link">Kartlar</a></li>
+            <li><a href="#gradients" class="nav-link">Gradients</a></li>
+            <li><a href="#shadows" class="nav-link">Gölgeler</a></li>
+            <li><a href="#spacing" class="nav-link">Boşluklar</a></li>
+        </ul>
+    </nav>
+
+    <!-- Colors Section -->
+    <section id="colors" class="section">
+        <div class="container">
+            <h2 class="section-title">Renk Paleti</h2>
+            <p class="section-subtitle">FitHubPoint marka renkleri - Fitness ve sağlık temasına uygun yeşil tonları</p>
+
+            <!-- Primary Colors -->
+            <div class="color-group">
+                <h3 class="color-group-title">Primary Colors</h3>
+                <div class="color-grid">
+                    <div class="color-card" onclick="copyColor('#021B1A')">
+                        <div class="color-preview" style="background: #021B1A;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Rich Black</div>
+                            <div class="color-hex">#021B1A</div>
+                            <div class="color-rgb">RGB: 2, 27, 26</div>
+                            <div class="color-usage">En koyu ton, ana arka plan</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#032221')">
+                        <div class="color-preview" style="background: #032221;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Dark Green</div>
+                            <div class="color-hex">#032221</div>
+                            <div class="color-rgb">RGB: 3, 34, 33</div>
+                            <div class="color-usage">Sidebar, header</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#03624C')">
+                        <div class="color-preview" style="background: #03624C;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Bangladesh Green</div>
+                            <div class="color-hex">#03624C</div>
+                            <div class="color-rgb">RGB: 3, 98, 76</div>
+                            <div class="color-usage">Orta koyu vurgular</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#2CC295')">
+                        <div class="color-preview" style="background: #2CC295;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Mountain Meadow</div>
+                            <div class="color-hex">#2CC295</div>
+                            <div class="color-rgb">RGB: 44, 194, 149</div>
+                            <div class="color-usage">Aktif durumlar</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#00DF81')">
+                        <div class="color-preview" style="background: #00DF81;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Caribbean Green</div>
+                            <div class="color-hex">#00DF81</div>
+                            <div class="color-rgb">RGB: 0, 223, 129</div>
+                            <div class="color-usage">Ana marka rengi, CTA</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#F1F7F6')">
+                        <div class="color-preview" style="background: #F1F7F6;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Anti-Flash White</div>
+                            <div class="color-hex">#F1F7F6</div>
+                            <div class="color-rgb">RGB: 241, 247, 246</div>
+                            <div class="color-usage">Açık arka plan, kartlar</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Colors -->
+            <div class="color-group">
+                <h3 class="color-group-title">Secondary Colors</h3>
+                <div class="color-grid">
+                    <div class="color-card" onclick="copyColor('#06302B')">
+                        <div class="color-preview" style="background: #06302B;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Pine</div>
+                            <div class="color-hex">#06302B</div>
+                            <div class="color-rgb">RGB: 6, 48, 43</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#0B453A')">
+                        <div class="color-preview" style="background: #0B453A;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Basil</div>
+                            <div class="color-hex">#0B453A</div>
+                            <div class="color-rgb">RGB: 11, 69, 58</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#095544')">
+                        <div class="color-preview" style="background: #095544;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Forest</div>
+                            <div class="color-hex">#095544</div>
+                            <div class="color-rgb">RGB: 9, 85, 68</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#1B7B6D')">
+                        <div class="color-preview" style="background: #1B7B6D;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Frog</div>
+                            <div class="color-hex">#1B7B6D</div>
+                            <div class="color-rgb">RGB: 27, 123, 109</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#2FA98C')">
+                        <div class="color-preview" style="background: #2FA98C;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Mint</div>
+                            <div class="color-hex">#2FA98C</div>
+                            <div class="color-rgb">RGB: 47, 169, 140</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#7D7D7D')">
+                        <div class="color-preview" style="background: #7D7D7D;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Stone</div>
+                            <div class="color-hex">#7D7D7D</div>
+                            <div class="color-rgb">RGB: 125, 125, 125</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#AACBC4')">
+                        <div class="color-preview" style="background: #AACBC4;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Pistachio</div>
+                            <div class="color-hex">#AACBC4</div>
+                            <div class="color-rgb">RGB: 170, 203, 196</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semantic Colors -->
+            <div class="color-group">
+                <h3 class="color-group-title">Semantic Colors</h3>
+                <div class="color-grid">
+                    <div class="color-card" onclick="copyColor('#00DF81')">
+                        <div class="color-preview" style="background: #00DF81;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Success</div>
+                            <div class="color-hex">#00DF81</div>
+                            <div class="color-usage">Başarılı işlemler</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#F59E0B')">
+                        <div class="color-preview" style="background: #F59E0B;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Warning</div>
+                            <div class="color-hex">#F59E0B</div>
+                            <div class="color-usage">Uyarı mesajları</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#EF4444')">
+                        <div class="color-preview" style="background: #EF4444;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Error</div>
+                            <div class="color-hex">#EF4444</div>
+                            <div class="color-usage">Hata mesajları</div>
+                        </div>
+                    </div>
+                    <div class="color-card" onclick="copyColor('#3B82F6')">
+                        <div class="color-preview" style="background: #3B82F6;"></div>
+                        <div class="color-info">
+                            <div class="color-name">Info</div>
+                            <div class="color-hex">#3B82F6</div>
+                            <div class="color-usage">Bilgi mesajları</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Typography Section -->
+    <section id="typography" class="section">
+        <div class="container">
+            <h2 class="section-title">Tipografi</h2>
+            <p class="section-subtitle">Axiforma font ailesi - Regular, Medium, Semi Bold ağırlıkları</p>
+
+            <div class="typography-showcase">
+                <div class="font-card">
+                    <div class="font-card-title">Font Family</div>
+                    <div class="font-preview">
+                        <div class="font-preview-large">Aa</div>
+                        <div class="font-preview-alphabet">ABCDEFGHIJKLMNOPQRSTUVWXYZ</div>
+                        <div class="font-preview-alphabet">abcdefghijklmnopqrstuvwxyz</div>
+                        <div class="font-preview-alphabet">1234567890!?@$#%</div>
+                    </div>
+                    <div class="font-weight-demo">
+                        <div class="weight-item">
+                            <span style="font-weight: 400;">Regular</span>
+                            <span class="weight-value">400</span>
+                        </div>
+                        <div class="weight-item">
+                            <span style="font-weight: 500;">Medium</span>
+                            <span class="weight-value">500</span>
+                        </div>
+                        <div class="weight-item">
+                            <span style="font-weight: 600;">Semi Bold</span>
+                            <span class="weight-value">600</span>
+                        </div>
+                        <div class="weight-item">
+                            <span style="font-weight: 700;">Bold</span>
+                            <span class="weight-value">700</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="font-card">
+                    <div class="font-card-title">Font Size Scale</div>
+                    <div class="font-scale">
+                        <div class="scale-item">
+                            <span class="scale-label">6xl - 60px</span>
+                            <span style="font-size: 2.5rem; font-weight: 600;">Heading</span>
+                        </div>
+                        <div class="scale-item">
+                            <span class="scale-label">4xl - 36px</span>
+                            <span style="font-size: 1.75rem; font-weight: 600;">Heading</span>
+                        </div>
+                        <div class="scale-item">
+                            <span class="scale-label">2xl - 24px</span>
+                            <span style="font-size: 1.5rem; font-weight: 500;">Subheading</span>
+                        </div>
+                        <div class="scale-item">
+                            <span class="scale-label">lg - 18px</span>
+                            <span style="font-size: 1.125rem;">Body Large</span>
+                        </div>
+                        <div class="scale-item">
+                            <span class="scale-label">base - 16px</span>
+                            <span style="font-size: 1rem;">Body Default</span>
+                        </div>
+                        <div class="scale-item">
+                            <span class="scale-label">sm - 14px</span>
+                            <span style="font-size: 0.875rem;">Small Text</span>
+                        </div>
+                        <div class="scale-item">
+                            <span class="scale-label">xs - 12px</span>
+                            <span style="font-size: 0.75rem;">Caption</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Buttons Section -->
+    <section id="buttons" class="section">
+        <div class="container">
+            <h2 class="section-title">Butonlar</h2>
+            <p class="section-subtitle">Farklı türler ve boyutlar</p>
+
+            <div class="button-showcase">
+                <div class="button-group">
+                    <span class="button-group-title">Button Variants</span>
+                    <button class="btn btn-primary">Primary</button>
+                    <button class="btn btn-secondary">Secondary</button>
+                    <button class="btn btn-outline">Outline</button>
+                    <button class="btn btn-ghost">Ghost</button>
+                </div>
+
+                <div class="button-group">
+                    <span class="button-group-title">Button Sizes</span>
+                    <button class="btn btn-primary btn-sm">Small</button>
+                    <button class="btn btn-primary">Default</button>
+                    <button class="btn btn-primary btn-lg">Large</button>
+                    <button class="btn btn-primary btn-xl">Extra Large</button>
+                </div>
+
+                <div class="button-group">
+                    <span class="button-group-title">With Icons</span>
+                    <button class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Add New
+                    </button>
+                    <button class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                        </svg>
+                        Download
+                    </button>
+                    <button class="btn btn-outline animate-glow">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                        Powered
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Forms Section -->
+    <section id="forms" class="section">
+        <div class="container">
+            <h2 class="section-title">Form Elemanları</h2>
+            <p class="section-subtitle">Input, select, textarea ve diğer form bileşenleri</p>
+
+            <div class="form-showcase">
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--caribbean-green);">Giriş Formu</h3>
+                    <div class="form-group">
+                        <label class="form-label">E-posta</label>
+                        <input type="email" class="form-input" placeholder="ornek@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Şifre</label>
+                        <input type="password" class="form-input" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Üyelik Tipi</label>
+                        <select class="form-input form-select">
+                            <option>Seçiniz...</option>
+                            <option>Öğrenci</option>
+                            <option>Hoca</option>
+                            <option>Admin</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;">Giriş Yap</button>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--caribbean-green);">Mesaj Formu</h3>
+                    <div class="form-group">
+                        <label class="form-label">Konu</label>
+                        <input type="text" class="form-input" placeholder="Mesaj konusu...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mesajınız</label>
+                        <textarea class="form-input form-textarea" placeholder="Mesajınızı yazın..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" style="flex: 1;">İptal</button>
+                        <button class="btn btn-primary" style="flex: 1;">Gönder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cards Section -->
+    <section id="cards" class="section">
+        <div class="container">
+            <h2 class="section-title">Kartlar</h2>
+            <p class="section-subtitle">Farklı kart tasarımları ve kullanım alanları</p>
+
+            <div class="card-showcase">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="card-title">Öğrenci Yönetimi</h4>
+                            <span class="card-subtitle">248 aktif öğrenci</span>
+                        </div>
+                    </div>
+                    <p class="card-content">
+                        Tüm öğrencilerinizi tek bir panel üzerinden yönetin. 
+                        İlerleme takibi, beslenme planları ve antrenman programları.
+                    </p>
+                    <div class="card-footer">
+                        <button class="btn btn-ghost btn-sm">Detaylar</button>
+                        <button class="btn btn-primary btn-sm">Yönet</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="card-title">Takvim & Randevu</h4>
+                            <span class="card-subtitle">12 randevu bu hafta</span>
+                        </div>
+                    </div>
+                    <p class="card-content">
+                        Randevularınızı kolayca planlayın ve takip edin.
+                        Otomatik hatırlatmalar ve takvim senkronizasyonu.
+                    </p>
+                    <div class="card-footer">
+                        <button class="btn btn-ghost btn-sm">Detaylar</button>
+                        <button class="btn btn-primary btn-sm">Takvim</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"/>
+                                <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="card-title">Gelir Takibi</h4>
+                            <span class="card-subtitle">₺24,580 bu ay</span>
+                        </div>
+                    </div>
+                    <p class="card-content">
+                        Gelir ve giderlerinizi anlık olarak takip edin.
+                        Detaylı raporlar ve finansal analiz araçları.
+                    </p>
+                    <div class="card-footer">
+                        <button class="btn btn-ghost btn-sm">Detaylar</button>
+                        <button class="btn btn-primary btn-sm">Rapor</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gradients Section -->
+    <section id="gradients" class="section">
+        <div class="container">
+            <h2 class="section-title">Gradients</h2>
+            <p class="section-subtitle">Marka gradient'leri ve kullanım örnekleri</p>
+
+            <div class="gradient-showcase">
+                <div class="gradient-card gradient-primary">
+                    <div class="gradient-name">Primary Gradient</div>
+                    <div class="gradient-code">linear-gradient(135deg, #03624C → #00DF81)</div>
+                </div>
+                <div class="gradient-card gradient-dark">
+                    <div class="gradient-name">Dark Gradient</div>
+                    <div class="gradient-code">linear-gradient(135deg, #032221 → #095544)</div>
+                </div>
+                <div class="gradient-card gradient-light">
+                    <div class="gradient-name">Light Gradient</div>
+                    <div class="gradient-code">linear-gradient(135deg, #2FA98C → #AACBC4)</div>
+                </div>
+                <div class="gradient-card gradient-glow">
+                    <div class="gradient-name">Glow Gradient</div>
+                    <div class="gradient-code">linear-gradient(135deg, #2CC295 → #00DF81 → #2FA98C)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shadows Section -->
+    <section id="shadows" class="section">
+        <div class="container">
+            <h2 class="section-title">Gölgeler</h2>
+            <p class="section-subtitle">Box shadow çeşitleri</p>
+
+            <div class="shadow-showcase">
+                <div class="shadow-card shadow-xs">
+                    <div class="shadow-label">shadow-xs</div>
+                </div>
+                <div class="shadow-card shadow-sm">
+                    <div class="shadow-label">shadow-sm</div>
+                </div>
+                <div class="shadow-card shadow-md">
+                    <div class="shadow-label">shadow-md</div>
+                </div>
+                <div class="shadow-card shadow-lg">
+                    <div class="shadow-label">shadow-lg</div>
+                </div>
+                <div class="shadow-card shadow-xl">
+                    <div class="shadow-label">shadow-xl</div>
+                </div>
+                <div class="shadow-card shadow-glow">
+                    <div class="shadow-label">shadow-glow</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spacing Section -->
+    <section id="spacing" class="section">
+        <div class="container">
+            <h2 class="section-title">Boşluk Sistemi</h2>
+            <p class="section-subtitle">8px tabanlı spacing scale</p>
+
+            <div class="spacing-showcase">
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-1 (4px)</span>
+                    <div class="spacing-bar" style="width: 4px;"></div>
+                </div>
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-2 (8px)</span>
+                    <div class="spacing-bar" style="width: 8px;"></div>
+                </div>
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-3 (12px)</span>
+                    <div class="spacing-bar" style="width: 12px;"></div>
+                </div>
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-4 (16px)</span>
+                    <div class="spacing-bar" style="width: 16px;"></div>
+                </div>
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-6 (24px)</span>
+                    <div class="spacing-bar" style="width: 24px;"></div>
+                </div>
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-8 (32px)</span>
+                    <div class="spacing-bar" style="width: 32px;"></div>
+                </div>
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-10 (40px)</span>
+                    <div class="spacing-bar" style="width: 40px;"></div>
+                </div>
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-12 (48px)</span>
+                    <div class="spacing-bar" style="width: 48px;"></div>
+                </div>
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-16 (64px)</span>
+                    <div class="spacing-bar" style="width: 64px;"></div>
+                </div>
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-20 (80px)</span>
+                    <div class="spacing-bar" style="width: 80px;"></div>
+                </div>
+                <div class="spacing-item">
+                    <span class="spacing-label">--spacing-24 (96px)</span>
+                    <div class="spacing-bar" style="width: 96px;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-logo">FitHubPoint</div>
+            <p class="footer-text">Brand Kit v1.0 • Design System • 2025</p>
+            <p class="footer-text" style="margin-top: 0.5rem;">TODESTEK Bilişim Hizmetleri</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Renk kopyalandı!</div>
+
+    <script>
+        // Copy color to clipboard
+        function copyColor(color) {
+            navigator.clipboard.writeText(color).then(() => {
+                showToast(`${color} kopyalandı!`);
+            });
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
