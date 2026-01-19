@@ -48,6 +48,10 @@ model Admin {
   userGroupId     String?       @map("user_group_id")
   userGroup       UserGroup?    @relation(fields: [userGroupId], references: [id])
 
+  phone           String?       @unique
+  twoFactorEnabled Boolean      @default(false) @map("two_factor_enabled")
+  twoFactorMethod  String?      @default("EMAIL") @map("two_factor_method") // EMAIL or PHONE
+
   lastLoginAt     DateTime?     @map("last_login_at")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
@@ -81,6 +85,17 @@ model Permission {
   
   @@unique([action, subject])
   @@map("permissions")
+}
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String   // JSON string for complex objects or plain text
+  description String?
+
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
 }
 
 // -----------------------------------------------------------------------------
@@ -150,6 +165,8 @@ model Client {
   activePlanId    String?       @map("active_plan_id")
   nutritionPlans  NutritionPlan[]
   appointments    Appointment[]
+  subscriptions   Subscription[]
+  payments        Payment[]
 
   lastLoginAt     DateTime?     @map("last_login_at")
   createdAt       DateTime      @default(now()) @map("created_at")
@@ -241,8 +258,111 @@ model Package {
   features        String[]
   isActive        Boolean  @default(true) @map("is_active")
   
+  subscriptions   Subscription[]
+
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   @@map("packages")
+}
+
+// -----------------------------------------------------------------------------
+// 5. LIBRARY & SYSTEM CONTENT (Admin Managed)
+// -----------------------------------------------------------------------------
+
+model CardioUnit {
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  metValue        Float?   @map("met_value") // Metabolic Equivalent of Task
+  defaultDuration Int?     @map("default_duration_minutes")
+  imageUrl        String?  @map("image_url")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("cardio_units")
+}
+
+model NutritionUnit {
+  id              String   @id @default(uuid())
+  name            String
+  brand           String?
+  calories        Int
+  protein         Float    @default(0)
+  carbs           Float    @default(0)
+  fat             Float    @default(0)
+  servingSize     String   @map("serving_size") // e.g. "100g", "1 slice"
+  imageUrl        String?  @map("image_url")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("nutrition_units")
+}
+
+model WorkoutUnit {
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  category        String?  // Strength, Flexibility, etc.
+  muscleGroup     String?  @map("muscle_group")
+  equipment       String?
+  videoUrl        String?  @map("video_url")
+  imageUrl        String?  @map("image_url")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("workout_units")
+}
+
+// -----------------------------------------------------------------------------
+// 6. FINANCE & SUBSCRIPTIONS
+// -----------------------------------------------------------------------------
+
+model Subscription {
+  id              String        @id @default(uuid())
+  
+  clientId        String        @map("client_id")
+  client          Client        @relation(fields: [clientId], references: [id])
+  
+  packageId       String        @map("package_id")
+  package         Package       @relation(fields: [packageId], references: [id])
+  
+  startDate       DateTime      @map("start_date")
+  endDate         DateTime      @map("end_date")
+  status          String        @default("ACTIVE") // ACTIVE, EXPIRED, CANCELLED
+  autoRenew       Boolean       @default(false) @map("auto_renew")
+  pricePaid       Decimal       @map("price_paid")
+  
+  payments        Payment[]
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@map("subscriptions")
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  
+  clientId        String        @map("client_id")
+  client          Client        @relation(fields: [clientId], references: [id])
+  
+  subscriptionId  String?       @map("subscription_id")
+  subscription    Subscription? @relation(fields: [subscriptionId], references: [id])
+  
+  amount          Decimal
+  currency        String        @default("TRY")
+  status          String        @default("COMPLETED") // PENDING, COMPLETED, FAILED, REFUNDED
+  method          String        @map("payment_method") // CREDIT_CARD, CASH, BANK_TRANSFER
+  transactionId   String?       @unique @map("transaction_id")
+  
+  paymentDate     DateTime      @default(now()) @map("payment_date")
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@map("payments")
 }

@@ -1,4 +1,5 @@
 import { PrismaClient, AdminRole, AccountStatus } from "@prisma/client"
+import { hash } from "bcryptjs"
 
 const prisma = new PrismaClient({
   datasourceUrl: process.env.DATABASE_URL,
@@ -6,9 +7,9 @@ const prisma = new PrismaClient({
 
 async function main() {
   const email = "unaluslusoy@todestek.net"
-  // Note: Password 'Unal.123' will be managed by Auth Provider (Firebase) in production.
-  // Here we just seed the DB record.
-  const passwordHash = "firebase_managed_placeholder" 
+  // Development: Use a real hash for local login testing without Firebase
+  const passwordText = "Unal.123"
+  const passwordHash = await hash(passwordText, 12)
 
   console.log(`Checking for existing admin: ${email}...`)
 
@@ -17,7 +18,12 @@ async function main() {
   })
 
   if (existingAdmin) {
-    console.log("Super Admin already exists.")
+    console.log("Super Admin already exists. Updating password for local dev...")
+    await prisma.admin.update({
+      where: { email },
+      data: { passwordHash }
+    })
+    console.log("Password updated to 'Unal.123'")
     return
   }
 

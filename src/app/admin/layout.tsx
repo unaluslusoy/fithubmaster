@@ -11,17 +11,28 @@ import {
 import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { logoutAdmin } from "@/app/(auth)/admin/login/actions"
+import { getProfile } from "./profile/actions"
+
 // Grouped Sidebar Menu Structure
 const sidebarGroups = [
   {
-    title: "Genel",
+    title: "Üyelikler",
     items: [
       { icon: LayoutDashboard, label: "Panel", href: "/admin" },
-      { icon: Users, label: "Profil", href: "/admin/profile" },
     ]
   },
   {
-    title: "Kullanıcı Yönetimi",
+    title: "Maliye",
     items: [
       { icon: Users, label: "Kullanıcılar", href: "/admin/users" },
       { icon: Shield, label: "Kullanıcı Grupları", href: "/admin/user-groups" },
@@ -96,8 +107,38 @@ function ThemeToggle() {
   )
 }
 
+// Theme-aware Logo Component
+function ThemeLogo() {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => setMounted(true), [])
+  
+  // Avoid hydration mismatch
+  if (!mounted) {
+    return <div className="h-8 w-32" />
+  }
+
+  return (
+    <img 
+      src={resolvedTheme === 'dark' ? '/fithub-point-white.svg' : '/fithub-point.svg'} 
+      alt="FitHub Point" 
+      className="h-8"
+    />
+  )
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    getProfile().then(res => {
+      if (res.success && res.data) {
+        setUser(res.data)
+      }
+    })
+  }, [])
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -105,14 +146,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="fixed inset-y-0 left-0 w-72 bg-sidebar-bg border-r border-sidebar-border hidden md:flex flex-col z-50">
         
         {/* Logo */}
-        <div className="h-16 flex items-center gap-3 px-6 border-b border-sidebar-border shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center shadow-lg">
-            <Zap className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <span className="font-bold text-lg text-sidebar-text-active">FitHub</span>
-            <span className="text-primary font-bold">Point</span>
-          </div>
+        <div className="h-16 flex items-center px-6 border-b border-sidebar-border shrink-0">
+          <Link href="/admin">
+            <ThemeLogo />
+          </Link>
         </div>
         
         {/* Navigation */}
@@ -143,23 +180,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           ))}
         </nav>
-
-        {/* User Section */}
-        <div className="p-4 border-t border-sidebar-border shrink-0">
-          <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-sidebar-hover transition-colors cursor-pointer">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-sm font-bold text-white">
-              AD
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-sidebar-text-active truncate">Admin User</p>
-              <p className="text-xs text-muted-foreground truncate">Super Admin</p>
-            </div>
-            <LogOut 
-              className="w-4 h-4 text-muted-foreground hover:text-destructive transition-colors cursor-pointer" 
-              onClick={() => window.location.href = "/admin/login"}
-            />
-          </div>
-        </div>
       </aside>
 
       {/* Main Content */}
@@ -183,6 +203,51 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Bell className="w-5 h-5 text-muted-foreground" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
             </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex items-center gap-3 pl-3 border-l border-border cursor-pointer">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-sm font-semibold text-foreground">
+                      {user ? `${user.firstName} ${user.lastName}` : "Yükleniyor..."}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Yönetici</p>
+                  </div>
+                  <Avatar className="h-10 w-10 border border-border cursor-pointer hover:opacity-80 transition-opacity">
+                    <AvatarImage 
+                      src={user?.avatarUrl && user.avatarUrl.length > 5 ? user.avatarUrl : "/avatars/01.png"} 
+                      alt={user ? `${user.firstName} ${user.lastName}` : "Admin"} 
+                    />
+                    <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                        {user?.firstName ? `${user.firstName[0]}${user.lastName?.[0] || ''}` : "AD"}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Hesabım</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/profile" className="cursor-pointer">
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>Profil</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/settings" className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Ayarlar</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer" onClick={async () => {
+                  await logoutAdmin()
+                  window.location.href = "/admin/login"
+                }}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Çıkış Yap</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 

@@ -1,66 +1,49 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Zap, Mail, Phone, Smartphone, ShieldCheck, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react"
+import { Zap, Mail, Phone, Smartphone, ShieldCheck, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-// Mock Settings (In real app, this comes from DB/Context)
-const SYSTEM_SETTINGS = {
-    twoFactorMethod: 'sms', // 'sms' | 'email' | 'app'
-    supportPhone: '+90 (850) 123 45 67'
-}
+import { verifyAdminCredentials, verify2FACode } from "./actions"
 
 export default function AdminLoginPage() {
   const router = useRouter()
   const [step, setStep] = useState<"credentials" | "2fa">("credentials")
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email")
   
-  // Form State
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [twoFactorCode, setTwoFactorCode] = useState("")
   
-  // UI State
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [fieldErrors, setFieldErrors] = useState<{email?: string, phone?: string}>({})
-
-  // 2FA Timer State
   const [timer, setTimer] = useState(0)
 
-  // Timer Effect
   useEffect(() => {
     let interval: NodeJS.Timeout
     if (timer > 0) {
-        interval = setInterval(() => {
-            setTimer((prev) => prev - 1)
-        }, 1000)
+      interval = setInterval(() => setTimer((prev) => prev - 1), 1000)
     }
     return () => clearInterval(interval)
   }, [timer])
 
-  // Reset timer when entering 2FA step
   useEffect(() => {
-      if (step === '2fa') {
-          setTimer(60)
-      }
+    if (step === '2fa') setTimer(60)
   }, [step])
 
   const handleResendCode = () => {
-      if (timer > 0) return
-      // Simulate API resend
-      console.log("Resending code...")
-      setTimer(60)
+    if (timer > 0) return
+    setTimer(60)
+    // Here we would call resend server action
   }
 
-  // Phone Masking Logic
   const formatPhoneNumber = (value: string) => {
     const numbers = value.replace(/\D/g, '')
     if (numbers.length === 0) return ''
@@ -70,355 +53,334 @@ export default function AdminLoginPage() {
   }
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPhone(formatPhoneNumber(e.target.value))
-      if (fieldErrors.phone) setFieldErrors({...fieldErrors, phone: undefined})
-  }
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setEmail(e.target.value)
-      if (fieldErrors.email) setFieldErrors({...fieldErrors, email: undefined})
-  }
-
-  // Validation
-  const validateForm = () => {
-      const errors: {email?: string, phone?: string} = {}
-      let isValid = true
-
-      if (loginMethod === 'email') {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-          if (!emailRegex.test(email)) {
-              errors.email = "Geçerli bir e-posta adresi giriniz."
-              isValid = false
-          }
-      } else {
-          const numericPhone = phone.replace(/\D/g, '')
-          if (numericPhone.length < 10) {
-              errors.phone = "Geçerli bir telefon numarası giriniz."
-              isValid = false
-          }
-      }
-
-      setFieldErrors(errors)
-      return isValid
+    setPhone(formatPhoneNumber(e.target.value))
   }
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     
-    if (!validateForm()) return
-    if (!password) {
-        setError("Lütfen parolanızı giriniz.")
-        return
+    if (loginMethod === 'email' && !email) {
+       setError("Lütfen e-posta adresinizi giriniz.")
+       return
     }
-
+    if (loginMethod === 'phone' && !phone) {
+       setError("Lütfen telefon numaranızı giriniz.")
+       return
+    }
+    if (!password) {
+      setError("Lütfen parolanızı giriniz.")
+      return
+    }
+    
     setLoading(true)
+    
+    // Identifier is either email or phone
+    const identifier = loginMethod === 'email' ? email : phone
 
     try {
-        console.log("Login Method:", loginMethod)
-        console.log("Credentials:", loginMethod === 'email' ? email : phone)
-        
-        setTimeout(() => {
-            setLoading(false)
-            setStep("2fa")
-        }, 1000)
+        const result = await verifyAdminCredentials(identifier, password)
+        setLoading(false)
 
+        if (result.success) {
+            if (result.requires2FA) {
+                setStep("2fa")
+            } else {
+                router.push("/admin")
+            }
+        } else {
+            setError(result.error || "Giriş başarısız.")
+        }
     } catch (err) {
-      setError("Giriş bilgileri doğrulanamadı.")
-      setLoading(false)
+        setLoading(false)
+        setError("Beklenmedik bir hata oluştu.")
     }
   }
 
   const handle2FASubmit = async (e: React.FormEvent) => {
-      e.preventDefault()
-      setLoading(true)
-      setError("")
+    e.preventDefault()
+    setLoading(true)
+    setError("")
 
-      try {
-        setTimeout(() => {
+    try {
+        const result = await verify2FACode(twoFactorCode)
+        if (result.success) {
             router.push("/admin")
-        }, 1000)
-      } catch (err) {
-          setError("Doğrulama kodu hatalı.")
-          setLoading(false)
-      }
+        } else {
+            setLoading(false)
+            setError(result.error || "Doğrulama başarısız.")
+        }
+    } catch (err) {
+        setLoading(false)
+        setError("Kod doğrulanamadı.")
+    }
   }
 
   return (
-    <div className="flex h-screen w-full bg-rich-black overflow-hidden">
+    <div className="flex min-h-screen bg-background">
       
-      {/* LEFT SIDE - Brand & Panel Info */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-rich-black text-white p-12 flex-col justify-between border-r border-white/5">
-        {/* Background Effects */}
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-bangladesh-green/20 rounded-full blur-[128px] pointer-events-none mix-blend-screen animate-pulse duration-1000" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-caribbean-green/5 rounded-full blur-[128px] pointer-events-none mix-blend-screen" />
+      {/* LEFT SIDE - Branding (Dark Always) */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-900 text-white p-12 flex-col justify-between overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-teal-500/10 rounded-full blur-3xl" />
         
-        {/* Content */}
+        {/* Logo */}
         <div className="relative z-10">
-             <div className="flex items-center gap-3 mb-10">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-bangladesh-green to-caribbean-green flex items-center justify-center shadow-glow">
-                    <Zap className="w-6 h-6 text-white fill-white" />
-                </div>
-                <h1 className="text-2xl font-bold tracking-tight">FitHub<span className="text-caribbean-green">Point</span></h1>
-             </div>
-
-             <div className="space-y-8 max-w-lg mt-20">
-                <h2 className="text-5xl font-bold leading-tight tracking-tight">
-                    İşletmenizi <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-caribbean-green to-pistachio">
-                        Geleceğe Taşıyın
-                    </span>
-                </h2>
-                <div className="space-y-4">
-                    <div className="flex items-start gap-3">
-                        <div className="mt-1 w-5 h-5 rounded-full bg-caribbean-green/20 flex items-center justify-center shrink-0">
-                            <CheckCircle2 className="w-3 h-3 text-caribbean-green" />
-                        </div>
-                        <p className="text-pistachio/80 font-light">Tüm üye verileri ve ödemeler tek ekranda.</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                        <div className="mt-1 w-5 h-5 rounded-full bg-caribbean-green/20 flex items-center justify-center shrink-0">
-                            <CheckCircle2 className="w-3 h-3 text-caribbean-green" />
-                        </div>
-                        <p className="text-pistachio/80 font-light">Gelişmiş antrenman ve beslenme programlama modülleri.</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                        <div className="mt-1 w-5 h-5 rounded-full bg-caribbean-green/20 flex items-center justify-center shrink-0">
-                            <CheckCircle2 className="w-3 h-3 text-caribbean-green" />
-                        </div>
-                        <p className="text-pistachio/80 font-light">7/24 Teknik destek ve düzenli güncellemeler.</p>
-                    </div>
-                </div>
-             </div>
+          <img 
+            src="/fithub-point-white.svg" 
+            alt="FitHub Point" 
+            className="h-12 w-auto"
+          />
         </div>
 
+        {/* Content */}
+        <div className="relative z-10 space-y-8 max-w-lg">
+          <h2 className="text-5xl font-bold leading-tight">
+            İşletmenizi <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+              Geleceğe Taşıyın
+            </span>
+          </h2>
+          <div className="space-y-4">
+            {["Tüm üye verileri ve ödemeler tek ekranda.", 
+              "Gelişmiş antrenman ve beslenme programlama modülleri.",
+              "7/24 Teknik destek ve düzenli güncellemeler."].map((text, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="mt-1 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                </div>
+                <p className="text-emerald-100/80">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
         <div className="relative z-10">
-            <p className="text-xs text-stone uppercase tracking-widest mb-4">Güvenlik Partnerleri</p>
-            <div className="flex items-center gap-6 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-               {/* Placeholders for partner logos if needed */}
-               <div className="h-8 w-24 bg-white/10 rounded"></div>
-               <div className="h-8 w-24 bg-white/10 rounded"></div>
-               <div className="h-8 w-24 bg-white/10 rounded"></div>
-            </div>
+          <p className="text-xs text-emerald-300/50 uppercase tracking-widest mb-3">Güvenlik Partnerleri</p>
+          <div className="flex items-center gap-4 opacity-40">
+            <div className="h-6 w-20 bg-white/20 rounded" />
+            <div className="h-6 w-20 bg-white/20 rounded" />
+            <div className="h-6 w-20 bg-white/20 rounded" />
+          </div>
         </div>
       </div>
 
-
       {/* RIGHT SIDE - Login Form */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 sm:p-12 bg-rich-black relative">
-        {/* Mobile Background Bloom */}
-        <div className="lg:hidden absolute top-0 left-0 w-full h-64 bg-caribbean-green/10 blur-[100px] pointer-events-none" />
+      <div className="w-full lg:w-1/2 flex flex-col justify-between items-center p-8 sm:p-12 bg-background">
+        <div className="flex-1 flex flex-col justify-center w-full max-w-md space-y-8">
+          
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex justify-center mb-6">
+            <img 
+              src="/fithub-point.svg" 
+              alt="FitHub Point" 
+              className="h-10 w-auto"
+            />
+          </div>
 
-        <div className="w-full max-w-[440px] space-y-8 relative z-10">
-            
-            {/* Brand Logo - Visible on Mobile Only */}
-            <div className="lg:hidden flex justify-center mb-8">
-                <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-bangladesh-green to-caribbean-green flex items-center justify-center shadow-glow">
-                        <Zap className="w-5 h-5 text-white fill-white" />
+          {step === "credentials" ? (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="text-center lg:text-left">
+                <h2 className="text-2xl font-bold text-foreground">Hesabınıza Giriş Yapın</h2>
+                <p className="text-muted-foreground mt-1">E-posta veya telefon ile giriş yapabilirsiniz.</p>
+              </div>
+
+              {/* Login Method Tabs */}
+              <div className="grid grid-cols-2 p-1 bg-secondary rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setLoginMethod('email')}
+                  className={cn(
+                    "flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all",
+                    loginMethod === 'email' 
+                      ? "bg-background text-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Mail className="w-4 h-4" />
+                  E-Posta
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLoginMethod('phone')}
+                  className={cn(
+                    "flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all",
+                    loginMethod === 'phone' 
+                      ? "bg-background text-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Phone className="w-4 h-4" />
+                  Telefon
+                </button>
+              </div>
+
+              {error && (
+                 <div className="p-3 text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-md">
+                   {error}
+                 </div>
+              )}
+
+              <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+                {loginMethod === 'email' ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="email">E-posta Adresi</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email" 
+                        placeholder="admin@fithub.com" 
+                        className="pl-9"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
                     </div>
-                    <span className="text-xl font-bold text-white">FitHubPoint</span>
-                </div>
-            </div>
-
-            {step === "credentials" ? (
-                <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-500">
-                    <div className="text-center lg:text-left space-y-2">
-                        <h2 className="text-3xl font-bold text-white tracking-tight">Giriş Yap</h2>
-                        <p className="text-stone">Hesabınıza erişmek için bilgilerinizi girin.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Telefon Numarası</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="phone"
+                        type="tel" 
+                        placeholder="(555) 000 00 00" 
+                        className="pl-9"
+                        value={phone}
+                        onChange={handlePhoneChange}
+                        required
+                      />
                     </div>
+                  </div>
+                )}
 
-                    {/* Login Method Tabs */}
-                    <div className="grid grid-cols-2 p-1 bg-pine/50 rounded-xl border border-white/5">
-                        <button
-                            onClick={() => setLoginMethod('email')}
-                            className={cn(
-                                "flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
-                                loginMethod === 'email' 
-                                    ? "bg-forest/50 text-white shadow-sm ring-1 ring-white/10" 
-                                    : "text-stone hover:text-white hover:bg-white/5"
-                            )}
-                        >
-                            <Mail className="w-4 h-4" /> E-posta
-                        </button>
-                        <button
-                            onClick={() => setLoginMethod('phone')}
-                            className={cn(
-                                "flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
-                                loginMethod === 'phone' 
-                                    ? "bg-forest/50 text-white shadow-sm ring-1 ring-white/10" 
-                                    : "text-stone hover:text-white hover:bg-white/5"
-                            )}
-                        >
-                            <Phone className="w-4 h-4" /> Telefon
-                        </button>
-                    </div>
-
-                    <form onSubmit={handleCredentialsSubmit} className="space-y-6">
-                        <div className="space-y-4">
-                            {/* Input Field */}
-                            <div className="space-y-1.5">
-                                <Label htmlFor="identity" className="text-xs font-semibold uppercase tracking-wider text-pistachio ml-1">
-                                    {loginMethod === 'email' ? 'E-posta Adresi' : 'Telefon Numarası'}
-                                </Label>
-                                <div className="relative group">
-                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone group-focus-within:text-caribbean-green transition-colors">
-                                        {loginMethod === 'email' ? <Mail className="w-5 h-5" /> : <Smartphone className="w-5 h-5" />}
-                                    </div>
-                                    <Input 
-                                        id="identity" 
-                                        type={loginMethod === 'email' ? 'email' : 'tel'}
-                                        placeholder={loginMethod === 'email' ? 'ad.soyad@sirketiniz.com' : '(555) 000 0000'}
-                                        value={loginMethod === 'email' ? email : phone}
-                                        onChange={loginMethod === 'email' ? handleEmailChange : handlePhoneChange}
-                                        className={cn(
-                                            "pl-10 h-12 bg-pine/30 border-white/10 text-white placeholder:text-stone/50 rounded-xl focus:border-caribbean-green/50 focus:ring-caribbean-green/20 transition-all",
-                                            (loginMethod === 'email' ? fieldErrors.email : fieldErrors.phone) && "border-red-500/50 focus:border-red-500"
-                                        )}
-                                        autoComplete={loginMethod === 'email' ? 'username' : 'tel'}
-                                    />
-                                    {(loginMethod === 'email' ? fieldErrors.email : fieldErrors.phone) && (
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 animate-in fade-in">
-                                            <AlertCircle className="w-5 h-5" />
-                                        </div>
-                                    )}
-                                </div>
-                                {(loginMethod === 'email' ? fieldErrors.email : fieldErrors.phone) && (
-                                    <p className="text-xs text-red-400 ml-1">
-                                        {loginMethod === 'email' ? fieldErrors.email : fieldErrors.phone}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <div className="flex items-center justify-between ml-1">
-                                    <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-pistachio">Parola</Label>
-                                    <a href="#" className="text-xs text-caribbean-green hover:text-mountain-meadow transition-colors font-medium">
-                                        Parolamı Unuttum
-                                    </a>
-                                </div>
-                                <Input 
-                                    id="password" 
-                                    type="password"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="h-12 bg-pine/30 border-white/10 text-white placeholder:text-stone/50 rounded-xl focus:border-caribbean-green/50 focus:ring-caribbean-green/20 transition-all px-4"
-                                    autoComplete="current-password"
-                                />
-                            </div>
-
-                            <div className="flex items-center space-x-2.5 ml-1">
-                                <Checkbox 
-                                    id="remember" 
-                                    checked={rememberMe}
-                                    onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                                    className="border-white/20 data-[state=checked]:bg-caribbean-green data-[state=checked]:text-rich-black w-5 h-5 rounded-md"
-                                />
-                                <Label htmlFor="remember" className="text-sm text-stone cursor-pointer select-none">
-                                    Bu cihazda oturumu açık tut
-                                </Label>
-                            </div>
-                        </div>
-
-                        {error && (
-                            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
-                                <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-                                <p className="text-sm text-red-400 font-medium">{error}</p>
-                            </div>
-                        )}
-
-                        <Button 
-                            type="submit" 
-                            disabled={loading}
-                            className="w-full h-12 rounded-xl bg-gradient-to-r from-bangladesh-green to-caribbean-green text-rich-black font-bold text-lg hover:shadow-glow hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 border-none group"
-                        >
-                            {loading ? (
-                                <span className="flex items-center gap-2">
-                                     <span className="w-4 h-4 border-2 border-rich-black/30 border-t-rich-black rounded-full animate-spin"></span>
-                                     Giriş Yapılıyor...
-                                </span>
-                            ) : (
-                                <span className="flex items-center gap-2">
-                                    Giriş Yap <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </span>
-                            )}
-                        </Button>
-                    </form>
-                </div>
-            ) : (
-                /* 2FA STEP */
-                <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-500 text-center lg:text-left">
-                    <button 
-                        onClick={() => setStep("credentials")} 
-                        className="text-stone hover:text-white text-sm flex items-center gap-1 transition-colors mb-4 group"
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="password">Parola</Label>
+                    <Link href="/admin/forgot-password" className="text-xs text-primary hover:underline">Unuttum?</Link>
+                  </div>
+                  <div className="relative">
+                    <Input 
+                      id="password"
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="••••••••" 
+                      className="font-mono text-sm pr-10"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground focus:outline-none"
                     >
-                         <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" /> Geri Dön
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </button>
-                    
-                    <div className="space-y-2">
-                        <div className="w-16 h-16 bg-caribbean-green/10 rounded-2xl flex items-center justify-center mb-4 mx-auto lg:mx-0 ring-1 ring-caribbean-green/20">
-                            <ShieldCheck className="w-8 h-8 text-caribbean-green" />
-                        </div>
-                        <h2 className="text-3xl font-bold text-white tracking-tight">Doğrulama</h2>
-                        <p className="text-stone">
-                            {SYSTEM_SETTINGS.twoFactorMethod === 'sms' 
-                                ? "Telefonunuza gönderilen SMS kodunu giriniz." 
-                                : "E-posta adresinize gönderilen doğrulama kodunu giriniz."}
-                        </p>
-                    </div>
-
-                    <form onSubmit={handle2FASubmit} className="space-y-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="2fa" className="sr-only">Kod</Label>
-                            <Input 
-                                id="2fa" 
-                                type="text"
-                                maxLength={6}
-                                placeholder="000 000"
-                                value={twoFactorCode}
-                                onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, ''))}
-                                className="h-20 text-center text-4xl font-mono tracking-[0.4em] bg-pine/30 border-white/10 text-caribbean-green placeholder:text-stone/10 rounded-xl focus:border-caribbean-green/50 focus:ring-caribbean-green/20"
-                                autoFocus
-                            />
-                        </div>
-
-                        <div className="flex items-center justify-between text-sm">
-                            <span className="text-stone">Kod gelmedi mi?</span>
-                            <button 
-                                type="button" 
-                                onClick={handleResendCode}
-                                disabled={timer > 0}
-                                className={cn(
-                                    "font-medium transition-colors",
-                                    timer > 0 
-                                        ? "text-stone cursor-not-allowed" 
-                                        : "text-caribbean-green hover:underline"
-                                )}
-                            >
-                                {timer > 0 ? `Tekrar gönder (${timer}s)` : "Tekrar Gönder"}
-                            </button>
-                        </div>
-
-                        <Button 
-                            type="submit" 
-                            disabled={loading}
-                            className="w-full h-12 rounded-xl bg-caribbean-green text-rich-black font-bold text-lg hover:bg-caribbean-green/90 transition-all border-none"
-                        >
-                            {loading ? "Doğrulanıyor..." : "Doğrula"}
-                        </Button>
-                    </form>
+                  </div>
                 </div>
-            )}
-            
-            {/* Footer */}
-            <div className="pt-8 border-t border-white/5 text-center px-4 mt-auto">
-               <p className="text-xs text-stone">
-                   Sorun mu yaşıyorsunuz? <a href="#" className="text-pistachio hover:text-white underline">Destek Ekibi</a> ile iletişime geçin.
-               </p>
+
+                <div className="flex items-center gap-2">
+                  <Checkbox id="remember" />
+                  <Label htmlFor="remember" className="font-normal text-muted-foreground cursor-pointer">
+                    Beni hatırla
+                  </Label>
+                </div>
+
+                <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                  {loading ? "Kontrol Ediliyor..." : "Devam Et"}
+                  {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
+                </Button>
+              </form>
             </div>
+          ) : (
+            /* 2FA STEP */
+            <div className="space-y-6 animate-in slide-in-from-right-8 duration-300">
+               <div className="text-center lg:text-left">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4 text-primary">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <h2 className="text-2xl font-bold text-foreground">Güvenlik Doğrulaması</h2>
+                <p className="text-muted-foreground mt-1">
+                  Lütfen <b>{loginMethod === 'email' ? email : phone}</b> adresine gönderilen 6 haneli kodu giriniz.
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 text-yellow-600">
+                    (Demo: Kod her zaman 123456)
+                </p>
+              </div>
+
+               {error && (
+                 <div className="p-3 text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-md">
+                   {error}
+                 </div>
+              )}
+
+              <form onSubmit={handle2FASubmit} className="space-y-6">
+                <div className="grid grid-cols-6 gap-2">
+                   {/* Simplified Input for 2FA - In real app use OTP Input */}
+                   <Input 
+                     className="col-span-6 text-center text-2xl tracking-widest h-14 font-mono"
+                     maxLength={6}
+                     value={twoFactorCode}
+                     onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g,''))}
+                     placeholder="000000"
+                   />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Kalan süre: <span className="text-primary font-medium">00:{timer < 10 ? `0${timer}` : timer}</span>
+                  </span>
+                  <button 
+                    type="button"
+                    onClick={handleResendCode}
+                    disabled={timer > 0}
+                    className={cn(
+                      "text-sm font-medium transition-colors",
+                      timer > 0 
+                        ? "text-muted-foreground cursor-not-allowed opacity-50" 
+                        : "text-primary hover:underline cursor-pointer"
+                    )}
+                  >
+                    Kodu Tekrar Gönder
+                  </button>
+                </div>
+
+                <div className="flex gap-3">
+                   <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => {
+                        setStep("credentials")
+                        setTwoFactorCode("")
+                        setError("")
+                    }}
+                   >
+                     Geri Dön
+                   </Button>
+                   <Button type="submit" className="flex-[2]" size="lg" disabled={loading}>
+                     {loading ? "Doğrulanıyor..." : "Doğrula ve Giriş Yap"}
+                   </Button>
+                </div>
+              </form>
+            </div>
+          )}
+          
+        </div>
+
+        <div className="text-center text-xs text-muted-foreground w-full">
+            <p>FitHub Point &copy; 2026</p>
         </div>
       </div>
     </div>
   )
 }
+

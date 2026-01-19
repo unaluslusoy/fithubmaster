@@ -4,28 +4,11 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, ArrowUpDown } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ArrowUpDown } from "lucide-react"
+import { UserData } from "./actions"
+import { UserRowActions } from "./user-row-actions"
 
-// This type is used to define the shape of our data.
-export type User = {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  role: "SUPER_ADMIN" | "TRAINER" | "CLIENT"
-  status: "ACTIVE" | "INACTIVE" | "SUSPENDED" | "PENDING"
-  createdAt: Date
-}
-
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<UserData>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -35,21 +18,21 @@ export const columns: ColumnDef<User>[] = [
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label="Tümünü seç"
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label="Satırı seç"
       />
     ),
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "firstName", // Accessor is firstName, but we display full name
+    accessorKey: "firstName",
     header: ({ column }) => {
         return (
           <Button
@@ -74,11 +57,28 @@ export const columns: ColumnDef<User>[] = [
     header: "Rol",
     cell: ({ row }) => {
       const role = row.getValue("role") as string
+      let displayRole = role
+      let variant: "default" | "destructive" | "secondary" | "outline" = "secondary"
+
+      if (role === "SUPER_ADMIN") {
+         displayRole = "Süper Admin"
+         variant = "destructive"
+      } else if (role === "EDITOR") {
+         displayRole = "Editör"
+         variant = "default"
+      } else if (role === "SUPPORT") {
+         displayRole = "Destek"
+         variant = "secondary"
+      }
+
       return (
-        <Badge variant={role === "SUPER_ADMIN" ? "destructive" : role === "TRAINER" ? "default" : "secondary"}>
-          {role}
+        <Badge variant={variant}>
+          {displayRole}
         </Badge>
       )
+    },
+    filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id))
     },
   },
   {
@@ -86,7 +86,7 @@ export const columns: ColumnDef<User>[] = [
     header: "Durum",
     cell: ({ row }) => {
         const status = row.getValue("status") as string
-        const colorClass = status === "ACTIVE" ? "text-green-600 bg-green-100" : status === "PENDING" ? "text-yellow-600 bg-yellow-100" : "text-red-600 bg-red-100";
+        const colorClass = status === "ACTIVE" ? "text-green-600 bg-green-100 dark:bg-green-900 dark:text-green-100" : status === "PENDING" ? "text-yellow-600 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-100" : "text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-100";
         
         return (
           <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClass}`}>
@@ -94,33 +94,12 @@ export const columns: ColumnDef<User>[] = [
           </div>
         )
       },
+      filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id))
+    },
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const user = row.original
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Menüyü aç</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Aksiyonlar</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.id)}
-            >
-              Kullanıcı ID Kopyala
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Düzenle</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">Sil</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
+    cell: ({ row }) => <UserRowActions row={row} />,
   },
 ]

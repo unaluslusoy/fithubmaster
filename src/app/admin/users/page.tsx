@@ -2,28 +2,40 @@
 
 import { useEffect, useState } from "react"
 import { getAdminUsers } from "./actions"
-import { User, columns } from "./columns"
+import { columns } from "./columns"
 import { DataTable } from "./data-table"
+import { Button } from "@/components/ui/button"
+import { UserDialog } from "./user-dialog"
+import { UserData } from "./actions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([])
+  const [users, setUsers] = useState<UserData[]>([])
   const [loading, setLoading] = useState(true)
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
+
+  async function loadUsers() {
+    setLoading(true)
+    const res = await getAdminUsers()
+    if (res.success && res.data) {
+      setUsers(res.data)
+    }
+    setLoading(false)
+  }
 
   useEffect(() => {
-    async function loadUsers() {
-      const res = await getAdminUsers()
-      if (res.success && res.data) {
-        // Need to map dates from JSON to Date objects if needed, but DataTable handles string/date usually
-        setUsers(res.data as unknown as User[]) 
-      }
-      setLoading(false)
-    }
     loadUsers()
   }, [])
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between">
+         <h1 className="text-3xl font-bold tracking-tight">Kullanıcı Yönetimi</h1>
+         <Button onClick={() => setShowCreateDialog(true)}>
+             + Yeni Kullanıcı
+         </Button>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Kullanıcı Listesi</CardTitle>
@@ -36,6 +48,12 @@ export default function UsersPage() {
           )}
         </CardContent>
       </Card>
+
+      <UserDialog 
+         open={showCreateDialog} 
+         onOpenChange={setShowCreateDialog} 
+         onSuccess={loadUsers} 
+      />
     </div>
   )
 }
